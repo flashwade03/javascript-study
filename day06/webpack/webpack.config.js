@@ -5,13 +5,13 @@ const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ImageminPlugin = require('imagemin-webpack');
 
 module.exports = {
   mode: 'production',
   devtool: false,
   performance: {
-    maxEntrypointSize: 900000,
-    maxAssetSize: 900000
+      hints: process.env.NODE_ENV === 'production' ? "warning" : false
   },
   optimization: {
     minimizer: [
@@ -40,21 +40,21 @@ module.exports = {
       {
         test: /\.(png|mp3)$/,
         use: [
-          'file-loader',
-          {
-            loader: 'image-webpack-loader',
-            options: {
-              pngquant: {
-                quality: [0.65, 0.90]
-              }
+            { 
+                loader: 'url-loader'
+            },
+            {
+                loader: ImageminPlugin.loader,
+                options: {
+                    bail: false,
+                    cache: true,
+                    imageminOptions: {
+                        plugins: ["pngquant", {quality:[0.6,0.9]}]
+                    }
+                }
             }
-          }
         ]
-      },
-      {
-        test: /\.(png|mp3)$/,
-        use: [{ loader: 'url-loader'}]
-      }
+      },    
     ]
   },
   plugins: [
