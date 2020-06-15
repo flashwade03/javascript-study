@@ -4,7 +4,6 @@ const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
-const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
@@ -38,18 +37,30 @@ module.exports = {
           loader: 'babel-loader'
         }
       },
+      {
+        test: /\.(png|mp3)$/,
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              pngquant: {
+                quality: [0.65, 0.90]
+              }
+            }
+          }
+        ]
+      },
+      {
+        test: /\.(png|mp3)$/,
+        use: [{ loader: 'url-loader'}]
+      }
     ]
   },
   plugins: [
     new CleanWebpackPlugin({
       root: path.resolve(__dirname, '../')
     }),
-    new CopyWebpackPlugin({
-      patterns:[
-        {from:path.resolve(__dirname, '../assets/**.png'), to:path.resolve(__dirname, '../dist')}
-      ]
-    }),
-    new ImageminPlugin({pngquant:{quality:'90-100'}}),
     new HtmlWebpackPlugin({
       template:'./index.html',
       inlineSource: '.js$'
